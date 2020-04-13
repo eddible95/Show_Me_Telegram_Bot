@@ -1,13 +1,22 @@
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, ConversationHandler
+from chatterbot.trainers import ChatterBotCorpusTrainer
 from telegram import ReplyKeyboardMarkup, ReplyKeyboardRemove
-from chatterbot.trainers import ListTrainer, ChatterBotCorpusTrainer
-from six.moves import cPickle as Pickle
+from keras.backend import set_session
+from keras.models import load_model
 from chatterbot import ChatBot
+import tensorflow as tf
+import numpy as np
 import pandas as pd
 import random
 import logging
 import joblib
 import ast
+
+# Load trained Keras Model
+sess = tf.Session()
+graph = tf.get_default_graph()
+set_session(sess)
+text_model = load_model('./Text Analytics Model/Movie_Metadata_Sentiments_Weighted_Keras.h5')
 
 # Enable logging
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
@@ -18,29 +27,37 @@ logger = logging.getLogger(__name__)
 GENRE, YEAR, RATINGS, CONVERSATION, PREDICT = range(5)
 
 
-# Stores all variables and functions for the Telegram bot
 class MyBot(object):
+    """Stores all variables and functions for the Telegram bot."""
+
     def __init__(self, chatter_bot, text_model, data_frame, vectorizer):
         self.chatterBot = chatter_bot
         self.textModel = text_model
         self.vectorizer = vectorizer
+        self.database = data_frame
         self.genre = ''
         self.year = ''
         self.rating = ''
         self.count = 0
         self.content = ''
-        self.database = data_frame
 
-    # Command for user to initiate conversation with the bot
+    def restart(self):
+        self.genre = ''
+        self.year = ''
+        self.rating = ''
+        self.count = 0
+        self.content = ''
+
     def start(self, update, context):
+        """Command for user to initiate conversation with the bot."""
         reply_keyboard = [['Drama', 'Comedy'], ['Action', 'Romance'], ['Thriller', 'Family']]
         update.message.reply_text("Hey there friend! Please select a genre of movie that you would be interested in.\n"
                                   "Send /cancel to stop me anytime ❌",
                                   reply_markup=ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=True))
         return GENRE
 
-    # Receives the genre of movies and prompt user for released year of movies
     def get_year(self, update, context):
+        """Receives the genre of movies and prompt user for released year of movies."""
         user = update.message.from_user
         self.genre = update.message.text
         update.message.reply_text('I see you are interested in movies of {} genres'.format(update.message.text))
@@ -51,8 +68,8 @@ class MyBot(object):
                                   reply_markup=ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=True))
         return YEAR
 
-    # Receives the released year of movies and prompt user for ratings
     def get_rating(self, update, context):
+        """Receives the released year of movies and prompt user for ratings."""
         user = update.message.from_user
         self.year = update.message.text
         update.message.reply_text('No issue! I\'ll only show movies from this period: {}'.format(update.message.text))
@@ -63,8 +80,8 @@ class MyBot(object):
                                   , reply_markup=ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=True))
         return RATINGS
 
-    # Receives the ratings of movies and prompt user for their current mood
     def get_mood(self, update, context):
+        """Receives the ratings of movies and prompt user for their current mood."""
         user = update.message.from_user
         self.rating = update.message.text
         update.message.reply_text(
@@ -78,19 +95,26 @@ class MyBot(object):
             reply_markup=ReplyKeyboardRemove())
         return CONVERSATION
 
-    # Classify the user's conversation into one of the 4 emotions using trained text classifier
     def get_prediction(self, user_input):
-        emotion_list = ['Anger', 'Fear', 'Joy', 'Sadness']
-        # Convert user input into format accepted by the text analytics model
-        d = {'Text_Content': [str(user_input)]}
-        df = pd.DataFrame(data=d)
-        text_counts = self.vectorizer.transform(df['Text_Content'])
-        # Predicts the emotions
-        pred_emotion = self.textModel.predict(text_counts)
-        return emotion_list[pred_emotion[0]]
+        """Classify the user's conversation into one of the 4 emotions using trained text classifier."""
+        global sess
+        global graph
+        with graph.as_default():
+            set_session(sess)
+            emotion_list = ['Anger', 'Fear', 'Joy', 'Sadness']
+            # Convert user input into format accepted by the text analytics model
+            d = {'Text_Content': [str(user_input)]}
+            df = pd.DataFrame(data=d)
+            text_counts = self.vectorizer.transform(df['Text_Content'])
+            # Reshape into format required by MLP
+            text_np = text_counts.toarray()
+            prediction = self.textModel.predict(text_np[0:1])
+            print(prediction)
+            pred_emotion = emotion_list[np.argmax(prediction)]
+            return pred_emotion
 
-    # Filter movie titles based on previous user's preference and predicted emotion
     def filter_movie(self, pred_emotion):
+        """Filter movie titles based on previous user's preference and predicted emotion."""
         data_base = self.database
         print(self.genre)
         print(self.rating)
@@ -114,17 +138,18 @@ class MyBot(object):
         if self.year == '<2005':
             data_base = data_base[data_base.release_date < 2005]
         title_list = data_base.title.to_list()
+        self.restart()
+        # If no movies are found, randomly recommend 5 movies
+        if len(title_list) == 0:
+            title_list = random.sample(self.database.title.to_list(), k=5)
         # If there are more than 5 movies, randomly recommend 5
         if len(title_list) > 5:
             title_list = random.sample(title_list, k=5)
         print(title_list)
-        self.genre = ''
-        self.rating = ''
-        self.year = ''
         return title_list
 
-    # Conversation with the user for 10 rounds
     def coversation(self, update, context):
+        """Conversation with the user for 10 rounds."""
         # If user choose to describe the mood instead of conversing
         if update.message.text == '/describe':
             self.describe(update, context)
@@ -136,13 +161,13 @@ class MyBot(object):
         # All user's reply will be stored and used for sentiment analysis
         self.content = self.content + " " + update.message.text
         self.count += 1
-        if self.count < 10:
+        if self.count < 5:
             return CONVERSATION
         else:
             return PREDICT
 
-    # Handle last conversation and analyse sentiments of all user's conversation
     def anaylse_sentiments(self, update, context):
+        """Handle last conversation and analyse sentiments of all user's conversation."""
         # Prompt user to type /start for a new conversation
         if (self.genre == '') | (self.rating == '') | (self.year == ''):
             update.message.reply_text("Hmmm...you look new here. Please type /start to begin then! 😀😀")
@@ -162,8 +187,6 @@ class MyBot(object):
             update.message.reply_text("Hey there cheer up! Let's not keep a 😥 ya! ")
 
         movies_title = self.filter_movie(pred_emotion)
-        # response = self.chatterBot.get_response(update.message.text)
-        # print(response)
         update.message.reply_text("I shall recommend you the following movies!🎬")
         reply = ''
         for index, item in enumerate(movies_title):
@@ -173,16 +196,15 @@ class MyBot(object):
             "Please Enjoy the recommended movies!🎞🎞 \nPlease type /start to be recommended more movies!!")
         return ConversationHandler.END
 
-    # Handle user's description about mood
     def textMessage(self, update, context):
+        """Handle user's description about mood."""
         # Prompt user to type /start for a new conversation
         if (self.genre == '') | (self.rating == '') | (self.year == ''):
             update.message.reply_text("Hmmm...you look new here. Please type /start to begin then! 😀😀")
-            return
+            return ConversationHandler.END
         update.message.reply_text("Hmmm...let me analyse your current mood.😨😭😡😀")
         print(update.message.text)
         pred_emotion = self.get_prediction(str(update.message.text))
-        self.content = ''
         if pred_emotion == 'Anger':
             update.message.reply_text("Oh dear..you seemed 🔥😡😡🔥")
         if pred_emotion == 'Fear':
@@ -193,8 +215,6 @@ class MyBot(object):
             update.message.reply_text("Hey there cheer up! Let's not keep a 😥 ya! ")
 
         movies_title = self.filter_movie(pred_emotion)
-        # response = self.chatterBot.get_response(update.message.text)
-        # print(response)
         update.message.reply_text("I shall recommend you the following movies!🎬")
         reply = ''
         for index, item in enumerate(movies_title):
@@ -203,41 +223,32 @@ class MyBot(object):
         update.message.reply_text(
             "Please Enjoy the recommended movies!🎞🎞 \nPlease type /start to be recommended more movies!!")
 
-    # Command for user to describe own mood
     def describe(self, update, context):
+        """Command for user to describe own mood."""
         update.message.reply_text("Please describe your current mood. 😀😀")
         return ConversationHandler.END
 
-    # Command for user to cancel any conversation with bot
     def cancel(self, update, context):
+        """Command for user to cancel any conversation with bot."""
+        self.restart()
         user = update.message.from_user
         logger.info("User %s canceled the conversation.", user.first_name)
         update.message.reply_text('Bye! Do find me again for recommendations via /start!',
                                   reply_markup=ReplyKeyboardRemove())
         return ConversationHandler.END
 
-    # Command for user to ask what the bot is about
     def help(self, update, context):
+        """Command for user to ask what the bot is about."""
         update.message.reply_text('❓ type /start to begin chatting with Show Me!')
 
-    # For logging of error
     def error(self, update, context):
         """Log Errors caused by Updates."""
         logger.warning('Update "%s" caused error "%s"', update, context.error)
 
 
-# Initalise the chatter bot and text classification model
 def initalise_bot():
-    # Chatter bot training for having conversation
-    chatter_bot = ChatBot(
-        "My ChatterBot",
-        logic_adapters=[
-            {
-                'import_path': 'chatterbot.logic.BestMatch',
-                'default_response': 'I am sorry, but I do not understand. I am still learning.'
-            }
-        ]
-    )
+    """Initalise the chatter bot and text classification mode."""
+    chatter_bot = ChatBot("My ChatterBot")
     corpus_trainer = ChatterBotCorpusTrainer(chatter_bot)
     # Trained with Corpus provided with response to some questions
     corpus_trainer.train('chatterbot.corpus.english.conversations')
@@ -246,17 +257,14 @@ def initalise_bot():
     print("Training Complete!")
 
     # Reading in all data
-    df = pd.read_csv('Movie_Metadata_Sentiments_Modified.csv')
+    df = pd.read_csv('./Text Analytics Model/Movie_Metadata_Sentiments_Modified.csv')
     # Convert data format for ease of filtering
     for i, row in enumerate(df.itertuples()):
         df.at[i, 'new_genres'] = ' '.join([str(elem) for elem in ast.literal_eval(row[29])])
         if len(str(row[18]).split('/')) > 2:
             df.at[i, 'release_date'] = int(str(row[18]).split('/')[2])
 
-    # Read in trained Text Classification Model & Vectorzer
-    with open('Movie_Metadata_Sentiments_LSV_model.model', 'rb') as file_handle:
-        text_model = Pickle.load(file_handle)
-    vectorizer = joblib.load("vectorizer.pkl")
+    vectorizer = joblib.load("./Text Analytics Model/vectorizer.pkl")
     print('Text Analytics Model Loaded!')
 
     # Initialise Telegram bot instance
@@ -279,7 +287,7 @@ def main():
             GENRE: [MessageHandler(Filters.regex('^(Drama|Comedy|Action|Romance|Thriller|Family)$'),
                                    my_bot.get_year)],
 
-            YEAR: [MessageHandler(Filters.regex('^(>2015|2010-2015|2005-2010|<2000)$'), my_bot.get_rating)],
+            YEAR: [MessageHandler(Filters.regex('^(>2015|2010-2015|2005-2010|<2005)$'), my_bot.get_rating)],
 
             RATINGS: [MessageHandler(Filters.regex('^(Average|Excellent)$'), my_bot.get_mood)],
 
