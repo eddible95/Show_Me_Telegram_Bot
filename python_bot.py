@@ -12,6 +12,7 @@ import logging
 import joblib
 import ast
 
+
 # Load trained Keras Model
 sess = tf.Session()
 graph = tf.get_default_graph()

@@ -3,7 +3,12 @@
   <component name="ChangeListManager">
     <list default="true" id="bb13326d-ba67-4cce-8d4b-40158cf61e98" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Movie_Metadata_Sentiments_Modified.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Text Analytics Model/Movie_Metadata_Sentiments.model" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Text Analytics Model/Movie_Metadata_Sentiments_LSV_model.model" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Text Analytics Model/sentiment_analysis.py" beforeDir="false" afterPath="$PROJECT_DIR$/Text Analytics Model/sentiment_analysis.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Text Analytics Model/text_classification_glda.py" beforeDir="false" afterPath="$PROJECT_DIR$/Text Analytics Model/text_classification_glda.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Text Analytics Model/text_classification_models.py" beforeDir="false" afterPath="$PROJECT_DIR$/Text Analytics Model/text_classification_models.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/db.sqlite3" beforeDir="false" afterPath="$PROJECT_DIR$/db.sqlite3" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/python_bot.py" beforeDir="false" afterPath="$PROJECT_DIR$/python_bot.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -32,6 +37,27 @@
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
   </component>
   <component name="RunManager" selected="Python.python_bot">
+    <configuration name="data_extraction" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="TelegramBot" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/Text Analytics Model" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/Text Analytics Model/data_extraction.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
     <configuration name="python_bot" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="TelegramBot" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -95,27 +121,6 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
-    <configuration name="text_classification_model" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
-      <module name="TelegramBot" />
-      <option name="INTERPRETER_OPTIONS" value="" />
-      <option name="PARENT_ENVS" value="true" />
-      <envs>
-        <env name="PYTHONUNBUFFERED" value="1" />
-      </envs>
-      <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
-      <option name="IS_MODULE_SDK" value="true" />
-      <option name="ADD_CONTENT_ROOTS" value="true" />
-      <option name="ADD_SOURCE_ROOTS" value="true" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/text_classification_model.py" />
-      <option name="PARAMETERS" value="" />
-      <option name="SHOW_COMMAND_LINE" value="false" />
-      <option name="EMULATE_TERMINAL" value="false" />
-      <option name="MODULE_MODE" value="false" />
-      <option name="REDIRECT_INPUT" value="false" />
-      <option name="INPUT_FILE" value="" />
-      <method v="2" />
-    </configuration>
     <configuration name="text_classification_models" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="TelegramBot" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -140,10 +145,10 @@
     <recent_temporary>
       <list>
         <item itemvalue="Python.python_bot" />
+        <item itemvalue="Python.data_extraction" />
         <item itemvalue="Python.text_classification_glda" />
         <item itemvalue="Python.text_classification_models" />
         <item itemvalue="Python.test_bot" />
-        <item itemvalue="Python.text_classification_model" />
       </list>
     </recent_temporary>
   </component>
@@ -173,25 +178,25 @@
       <screen x="-1920" y="493" width="1920" height="1040" />
     </state>
     <state x="-1230" y="760" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog/0.0.1829.989/-1920.493.1920.1040@-1920.493.1920.1040" timestamp="1586675893508" />
-    <state width="1899" height="300" key="GridCell.Tab.0.bottom" timestamp="1586802615128">
+    <state width="1899" height="300" key="GridCell.Tab.0.bottom" timestamp="1586840485766">
       <screen x="-1920" y="493" width="1920" height="1040" />
     </state>
-    <state width="1899" height="300" key="GridCell.Tab.0.bottom/0.0.1829.989/-1920.493.1920.1040@-1920.493.1920.1040" timestamp="1586802615128" />
+    <state width="1899" height="300" key="GridCell.Tab.0.bottom/0.0.1829.989/-1920.493.1920.1040@-1920.493.1920.1040" timestamp="1586840485766" />
     <state width="1807" height="252" key="GridCell.Tab.0.bottom/0.0.1829.989/-1920.493.1920.1040@0.0.1829.989" timestamp="1586683129264" />
-    <state width="1899" height="300" key="GridCell.Tab.0.center" timestamp="1586802615128">
+    <state width="1899" height="300" key="GridCell.Tab.0.center" timestamp="1586840485766">
       <screen x="-1920" y="493" width="1920" height="1040" />
     </state>
-    <state width="1899" height="300" key="GridCell.Tab.0.center/0.0.1829.989/-1920.493.1920.1040@-1920.493.1920.1040" timestamp="1586802615128" />
+    <state width="1899" height="300" key="GridCell.Tab.0.center/0.0.1829.989/-1920.493.1920.1040@-1920.493.1920.1040" timestamp="1586840485766" />
     <state width="1807" height="252" key="GridCell.Tab.0.center/0.0.1829.989/-1920.493.1920.1040@0.0.1829.989" timestamp="1586683129264" />
-    <state width="1899" height="300" key="GridCell.Tab.0.left" timestamp="1586802615128">
+    <state width="1899" height="300" key="GridCell.Tab.0.left" timestamp="1586840485766">
       <screen x="-1920" y="493" width="1920" height="1040" />
     </state>
-    <state width="1899" height="300" key="GridCell.Tab.0.left/0.0.1829.989/-1920.493.1920.1040@-1920.493.1920.1040" timestamp="1586802615128" />
+    <state width="1899" height="300" key="GridCell.Tab.0.left/0.0.1829.989/-1920.493.1920.1040@-1920.493.1920.1040" timestamp="1586840485766" />
     <state width="1807" height="252" key="GridCell.Tab.0.left/0.0.1829.989/-1920.493.1920.1040@0.0.1829.989" timestamp="1586683129264" />
-    <state width="1899" height="300" key="GridCell.Tab.0.right" timestamp="1586802615128">
+    <state width="1899" height="300" key="GridCell.Tab.0.right" timestamp="1586840485766">
       <screen x="-1920" y="493" width="1920" height="1040" />
     </state>
-    <state width="1899" height="300" key="GridCell.Tab.0.right/0.0.1829.989/-1920.493.1920.1040@-1920.493.1920.1040" timestamp="1586802615128" />
+    <state width="1899" height="300" key="GridCell.Tab.0.right/0.0.1829.989/-1920.493.1920.1040@-1920.493.1920.1040" timestamp="1586840485766" />
     <state width="1807" height="252" key="GridCell.Tab.0.right/0.0.1829.989/-1920.493.1920.1040@0.0.1829.989" timestamp="1586683129264" />
     <state width="1899" height="348" key="GridCell.Tab.1.bottom" timestamp="1586455244048">
       <screen x="-1920" y="493" width="1920" height="1040" />
@@ -209,10 +214,10 @@
       <screen x="-1920" y="493" width="1920" height="1040" />
     </state>
     <state width="1899" height="348" key="GridCell.Tab.1.right/0.0.1829.989/-1920.493.1920.1040@-1920.493.1920.1040" timestamp="1586455244048" />
-    <state x="625" y="327" key="com.intellij.ide.util.TipDialog" timestamp="1586802123094">
+    <state x="625" y="327" key="com.intellij.ide.util.TipDialog" timestamp="1586840375225">
       <screen x="0" y="0" width="1829" height="989" />
     </state>
-    <state x="625" y="327" key="com.intellij.ide.util.TipDialog/0.0.1829.989/-1920.493.1920.1040@-1920.493.1920.1040" timestamp="1586802123094" />
+    <state x="625" y="327" key="com.intellij.ide.util.TipDialog/0.0.1829.989/-1920.493.1920.1040@-1920.493.1920.1040" timestamp="1586840375225" />
     <state x="290" y="311" width="1553" height="674" maximized="true" key="dock-window-1" timestamp="1586701495476">
       <screen x="0" y="0" width="1829" height="989" />
     </state>

@@ -59,5 +59,5 @@ print("Linear Support Vector Machine Accuracy:", metrics.accuracy_score(y_test, 
 print(classification_report(y_test, predicted, target_names=le.classes_))
 
 # Save the model to be imported into Telegram bot
-with open('Movie_Metadata_Sentiments_LSV_model.model', 'wb') as file_handle:
+with open('Movie_Metadata_Sentiments_SVM.model', 'wb') as file_handle:
     Pickle.dump(clf, file_handle)

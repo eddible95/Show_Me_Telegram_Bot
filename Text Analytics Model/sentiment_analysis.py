@@ -1,64 +1,13 @@
 import pandas as pd
+from tqdm import tqdm
 from nltk import word_tokenize
 from nltk.stem.snowball import SnowballStemmer
 import nltk
 
 nltk.download('punkt')
-from tqdm import tqdm
 
-
-def text_emotion(df, column):
-    '''
-    Takes a DataFrame and a specified column of text and adds 10 columns to the
-    DataFrame for each of the 10 emotions in the NRC Emotion Lexicon, with each
-    column containing the value of the text in that emotions
-    INPUT: DataFrame, string
-    OUTPUT: the original DataFrame with ten new columns
-    '''
-
-    new_df = df.copy()
-
-    file_path = "NRC-Emotion-Lexicon-Wordlevel-v0.92.txt"
-    emolex_df = pd.read_csv(file_path,
-                            names=["word", "emotion", "association"],
-                            sep='\t')
-    emolex_words = emolex_df.pivot(index='word',
-                                   columns='emotion',
-                                   values='association').reset_index()
-    emotions = emolex_words.columns.drop('word')
-    emo_df = pd.DataFrame(0, index=df.index, columns=emotions)
-
-    stemmer = SnowballStemmer("english")
-
-    with tqdm(total=len(list(new_df.iterrows()))) as pbar:
-        for i, row in enumerate(new_df.itertuples()):
-            pbar.update(1)
-            document = word_tokenize(row[8])
-            for word in document:
-                word = stemmer.stem(word.lower())
-                emo_score = emolex_words[emolex_words.word == word]
-                if not emo_score.empty:
-                    print(emo_score['anger'].values[0])
-                    emo_df.at[i, 'anger'] += emo_score['anger']
-                    emo_df.at[i, 'anticipation'] += emo_score['anticipation']
-                    emo_df.at[i, 'disgust'] += emo_score['disgust']
-                    emo_df.at[i, 'fear'] += emo_score['fear']
-                    emo_df.at[i, 'joy'] += emo_score['joy']
-                    emo_df.at[i, 'negative'] += emo_score['negative']
-                    emo_df.at[i, 'positive'] += emo_score['positive']
-                    emo_df.at[i, 'sadness'] += emo_score['sadness']
-                    emo_df.at[i, 'surprise'] += emo_score['surprise']
-                    emo_df.at[i, 'trust'] += emo_score['trust']
-            if i % 100 == 0:
-                dataframe = pd.concat([new_df, emo_df], axis=1)
-                dataframe.to_csv('Sentiments.csv')
-
-    new_df = pd.concat([new_df, emo_df], axis=1)
-    return new_df
-
-
-df = pd.read_csv('wiki_movie_plots_deduped.csv')
-list_of_plots = df['Plot'].to_list()
+df = pd.read_csv('Modified_Movies_Metadata.csv')
+list_of_plots = df['Text_Content'].to_list()
 file_path = "NRC-Emotion-Lexicon-Wordlevel-v0.92.txt"
 emolex_df = pd.read_csv(file_path,
                         names=["word", "emotion", "association"],

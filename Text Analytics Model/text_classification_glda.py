@@ -141,7 +141,7 @@ def run():
         print('Topic {}: {}'.format(i, ' '.join(topic_words)))
 
     # Save the model to be imported into Telegram bot
-    with open('Movie_Metadata_Sentiments.model', 'wb') as file_handle:
+    with open('Movie_Metadata_Sentiments_GLDA.model', 'wb') as file_handle:
         Pickle.dump(model, file_handle)
 
     # Save the Dictionary and Corpus
